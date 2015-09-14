@@ -1,0 +1,32 @@
+<valuedata xmlns="http://pennmutual.com/hpa/hpavalueset"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://pennmutual.com/hpa/hpavalueset hpavalueset.xsd">
+
+  <valueset id="HPA_RemitterRelationsToCase">
+    <item name="1">Insured</item>
+    <item name="12">Payor</item>
+    <item name="18">Owner</item>
+  </valueset>
+  
+  <valueset id="HPA_MimeType">
+  	<item name="2">text/richtext</item>
+    <item name="3">image/jpeg</item>
+    <item name="4">image/gif</item>
+    <item name="11">image/tiff</item>
+    <item name="2147483647">application/PDF</item>
+  </valueset>
+  
+  <valueset id="HPA_ImageType">
+    <item name="1">JPEG</item>
+    <item name="2">GIF</item>
+    <item name="3">TIFF</item>
+    <item name="4">PDF</item>
+    <item name="2147483647">Other</item>
+  </valueset>
+  
+  <valueset id="HPA_FinActivityType">
+    <item name="7">Initial Payment</item>
+    <item name="192">Rollover from an initial payment</item>
+  </valueset>
+  
+</valuedata>

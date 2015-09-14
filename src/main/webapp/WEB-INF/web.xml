@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  id="WebApp_ID" version="2.5">
+
+  <!--
+  -
+  - Global configuration
+  -
+  -->
+    
+  <display-name>${displayName}</display-name>
+
+  <welcome-file-list>
+    <welcome-file>upload</welcome-file>
+  </welcome-file-list>
+  
+  <!-- SSO token extends for 60 minutes. Ensure that the HPA session expires before then. -->
+  <session-config>
+    <session-timeout>59</session-timeout>
+  </session-config>
+  
+  <!-- Error pages -->
+  <error-page>
+    <!-- Forbidden directory listing -->
+    <error-code>403</error-code>
+    <location>/not_authorized.jsp</location>
+  </error-page>
+  <error-page>
+    <!-- Internal server error -->
+    <error-code>500</error-code>
+    <location>/internal_server_error.jsp</location>
+  </error-page>
+ 
+  <!--
+  -
+  - HPA configuration
+  - 
+  -->
+
+  <!-- Spring-MVC dispatcher servlet for HPA. -->
+  <servlet>
+    <servlet-name>hpaTransferServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath*:/spring/hpa-context.xml</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>hpaTransferServlet</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+  
+</web-app>

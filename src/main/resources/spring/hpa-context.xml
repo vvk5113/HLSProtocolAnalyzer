@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:oxm="http://www.springframework.org/schema/oxm"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.2.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+        http://www.springframework.org/schema/oxm
+        http://www.springframework.org/schema/oxm/spring-oxm-3.2.xsd">
+	
+    <mvc:annotation-driven conversion-service="conversionService">
+      <mvc:message-converters register-defaults="true">
+        <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+          <property name="objectMapper" ref="jacksonObjectMapper" />
+        </bean>
+      </mvc:message-converters>
+    </mvc:annotation-driven>
+        
+  	<context:component-scan base-package="com.psu.hpa" />
+	    
+    <!--  Custom formatters -->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+      <property name="formatters">
+        <set>
+          <bean class="com.psu.hpa.format.DateFormatter"/>
+        </set>
+      </property>
+    </bean>
+           
+	<!-- freemarker config -->
+	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+	  <property name="templateLoaderPath" value="classpath:/freemarker" />
+      <property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+<!-- 	<tx:annotation-driven/> -->
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <property name="maxUploadSize" value="10485760"/> <!-- 10 MiB -->
+    <property name="resolveLazily" value="true"/>
+  </bean>
+
+  	<!-- 
+	
+	  View resolvers can also be configured with ResourceBundles or XML files. If you need
+	  different view resolving based on Locale, you have to use the resource bundle resolver.
+	
+	-->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+	  <!-- change cache back to false when not in development mode -->
+	  <property name="cache" value="${freemarker.cache}" />
+	  <property name="prefix" value="" />
+	  <property name="suffix" value=".ftl" />
+	</bean>
+    
+    <!-- Field info lookup tool -->
+  <bean id="fieldInfo" class="com.psu.hpa.application.FieldInfo" />
+    
+  <!-- Messages -->
+<!--   <bean id="messageSource" class="com.psu.hpa.messagesource.HPAMessageSource">
+    <property name="basename" value="classpath:/messages"/>
+  </bean> -->
+     
+  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    <property name="host" value="${email.host}"/>
+  </bean>
+  
+    <!-- JSON object mapping -->
+  <bean id="jacksonObjectMapper" class="com.psu.hpa.HPAObjectMapper"/>
+    
+</beans>

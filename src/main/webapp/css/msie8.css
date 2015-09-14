@@ -1,0 +1,13 @@
+input.ui-input-text, textarea.ui-input-text {
+  background-color: #fff;
+}
+
+/* Need to differentiate this from a text field in IE. */
+div.ui-body-d {
+  border-style: none;
+}
+
+/* Opacity is broken in IE, so set the nav text color. */
+.ui-btn-text.disabled {
+  color: #919191;
+}
