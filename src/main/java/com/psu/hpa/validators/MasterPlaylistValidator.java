@@ -52,7 +52,7 @@ public class MasterPlaylistValidator implements PlaylistValidator {
 					}
 					
 					if(contentList.get(i+1).startsWith("#") || !contentList.get(i+1).endsWith(".m3u8")) {
-						sb.append(Constants.MATCH_EXT_X_STREAM_INF+" uri missing");
+						sb.append(Constants.EXT_X_STREAM_INF+" uri missing");
 						sb.append("\n\r");
 					} else {
 						Matcher matchEXT_X_STREAM_INF_URI = Constants.MATCH_EXT_X_STREAM_INF_URI.matcher(contentList.get(i+1));

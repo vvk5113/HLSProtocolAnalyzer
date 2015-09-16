@@ -36,7 +36,7 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 			
 			Matcher matchEXTM3U = Constants.MATCH_EXTM3U.matcher(contentList.get(0));
 			if(!matchEXTM3U.matches()) {
-				sb.append("The starting element "+Constants.MATCH_EXTM3U+" is in incorrect format");
+				sb.append("The starting element "+Constants.EXTM3U+" is in incorrect format");
 				sb.append("\n\r");
 			}
 			
@@ -91,7 +91,7 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 				if(lineContent.contains(Constants.EXT_X_MEDIA_SEQUENCE)) {
 					Matcher matchEXT_X_MEDIA_SEQUENCE = Constants.MATCH_EXT_X_MEDIA_SEQUENCE.matcher(lineContent);
 					if(!matchEXT_X_MEDIA_SEQUENCE.matches()) {
-						sb.append(Constants.MATCH_EXT_X_MEDIA_SEQUENCE+" is in incorrect format");
+						sb.append(Constants.EXT_X_MEDIA_SEQUENCE+" is in incorrect format");
 						sb.append("\n\r");
 					}
 				}
@@ -99,7 +99,7 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 				if(lineContent.contains(Constants.EXTINF)) {
 					Matcher matchMATCH_EXTINF = Constants.MATCH_EXTINF.matcher(lineContent);
 					if(!matchMATCH_EXTINF.matches()) {
-						sb.append(Constants.MATCH_EXTINF+" is in incorrect format");
+						sb.append(Constants.EXTINF+" is in incorrect format");
 						sb.append("\n\r");
 					}
 					
