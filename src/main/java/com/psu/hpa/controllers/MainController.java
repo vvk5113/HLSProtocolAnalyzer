@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -263,96 +264,67 @@ public class MainController extends SessionUploadFormController {
 		String masterPlaylistName = masterPlaylistStreamURL.substring(masterPlaylistStreamURL.lastIndexOf("/")+1, masterPlaylistStreamURL.length());
 		List<String> masterPlaylistContents = readFile(new URL(masterPlaylistStreamURL));
 		
+		masterPlaylistSB.append("******** Starting validation of the master playlist "+masterPlaylistName+" *********");
+		masterPlaylistSB.append("\r\n");
+		
 		if(CollectionUtils.isNotEmpty(masterPlaylistContents)) {
 			masterPlaylistValidator.validate(masterPlaylistContents, masterPlaylistSB, masterPlaylistName);
 			for(String lineContent : masterPlaylistContents) {
 				if(!lineContent.startsWith("#") && lineContent.endsWith(".m3u8")) {
 					String mediaPlayListStreamURL = masterPlaylistStreamURL.replace(masterPlaylistName, lineContent);
-					List<String> mediaPlaylistContents = readFile(new URL(mediaPlayListStreamURL));
+					List<String> mediaPlaylistContents = null;
+					try {
+						mediaPlaylistContents = readFile(new URL(mediaPlayListStreamURL));
+					} catch(FileNotFoundException fnfe) {
+						masterPlaylistSB.append("Media playlist file "+lineContent+" is missing");
+						masterPlaylistSB.append("\r\n");
+						fnfe.printStackTrace();
+					} catch(Exception ex) {
+						ex.printStackTrace();
+					}
 					if(CollectionUtils.isNotEmpty(mediaPlaylistContents)) {
 						mediaPlaylistValidator.validate(mediaPlaylistContents, mediaPlaylistSB, lineContent);
 					}
 				}
-			}
+			}	
+		
+			masterPlaylistSB.append("******** Validating of the master playlist ends *********");
+			
+			String dirPath = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-logs");
+			File fileDir = new File(dirPath);
+			fileDir.mkdirs();
+			File masterPlaylistValidationLogFile = new File(fileDir, "MasterPlaylistValidation.log");
+			File mediaPlaylistValidationLogFile = new File(fileDir, "MediaPlaylistValidation.log");
+			
+			FileUtils.writeStringToFile(masterPlaylistValidationLogFile, masterPlaylistSB.toString());
+			FileUtils.writeStringToFile(mediaPlaylistValidationLogFile, mediaPlaylistSB.toString());
+			
+			ErrorMailSender.sendEmail(upload.getUserEmail(), session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-logs/MediaPlaylistValidation.log"));
+			
+			upload.setMasterPlaylistValidationResult(session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-logs/MasterPlaylistValidation.log"));
+			upload.setMediaPlaylistValidationResult(session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-logs/MediaPlaylistValidation.log"));
+			
+			return new RedirectView(RESULTS_URL);
 		}
-		
-		String dirPath = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-logs");
-		File fileDir = new File(dirPath);
-		fileDir.mkdirs();
-		File masterPlaylistValidationLogFile = new File(fileDir, "MasterPlaylistValidation.log");
-		File mediaPlaylistValidationLogFile = new File(fileDir, "MediaPlaylistValidation.log");
-		
-		FileUtils.writeStringToFile(masterPlaylistValidationLogFile, masterPlaylistSB.toString());
-		FileUtils.writeStringToFile(mediaPlaylistValidationLogFile, mediaPlaylistSB.toString());
-		
-		ErrorMailSender.sendEmail(upload.getUserEmail(), session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-logs/MediaPlaylistValidation.log"));
-		//ErrorMailSender.sendEmail(upload.getUserEmail(), "MediaPlaylistValidation.log");
-		
-		//FileUtils.copyURLToFile(new URL(upload.getStreamURL()), outPath);
 
 		result.reject("GenericError");
 		return discardBadFieldsOrGetErrorRedirect(request, upload, result, redirectAttrs);
 	}
 	
-	private List<String> readFile(URL streamURL) {
+	private List<String> readFile(URL streamURL)  throws FileNotFoundException, IOException {
 		List<String> contentList = new ArrayList<String>();
 		BufferedReader in;
-		try {
-			in = new BufferedReader(new InputStreamReader(streamURL.openStream()));
-			String inputLine;
-		    while ((inputLine = in.readLine()) != null) {
-		        System.out.println(inputLine);
-		        contentList.add(inputLine);
-		    }
-		    in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		in = new BufferedReader(new InputStreamReader(streamURL.openStream()));
+		String inputLine;
 		
+	    while ((inputLine = in.readLine()) != null) {
+	        contentList.add(inputLine);
+	    }
+	    
+	    in.close();
 		return contentList;
 	}
 	
-	/*private List<String> readFile(String file) {
-		List<String> contentList = new ArrayList<String>();
-		  try{
-			  FileInputStream fstream = new FileInputStream(file);
-			  DataInputStream in = new DataInputStream(fstream);
-			  BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			  String strLine;
-			  while ((strLine = br.readLine()) != null)   {
-				  System.out.println (strLine);
-				  contentList.add(strLine);
-			  }
-			  in.close();
-		    }catch (Exception e){
-		    	System.err.println("Error: " + e.getMessage());
-		    }
-		  return contentList;
-	  }*/
-	
-	private static void getFiles(File input, ArrayList<File> files)
-	{
-	    if(input.isDirectory())
-	    {
-	        ArrayList <File> path = new ArrayList<File>(Arrays.asList(input.listFiles()));
-	        for(int i=0 ; i<path.size(); ++i)
-	        {
-	            if(path.get(i).isDirectory())
-	            {
-	            	getFiles(path.get(i), files);
-	            }
-	            if(path.get(i).isFile())
-	            {
-	                files.add(path.get(i));
-	            }
-	        }
-	    }
-	    if(input.isFile())
-	    {
-	        files.add(input);
-	    }
-	}
-
 	/**
 	 * Gets the results page for an upload.
 	 *
