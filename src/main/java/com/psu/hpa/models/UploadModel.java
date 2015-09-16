@@ -34,6 +34,12 @@ public class UploadModel implements Serializable {
 	@NotNull
 	@NotInFuture
 	private Date effectiveDate;
+	
+	/** The master playlist validation result. */
+	private String masterPlaylistValidationResult;
+	
+	/** The media playlist validation result. */
+	private String mediaPlaylistValidationResult;
 
 	public UploadModel() {
 		effectiveDate = new Date();
@@ -143,6 +149,35 @@ public class UploadModel implements Serializable {
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
 	}
-	
+
+	/**
+	 * @return the masterPlaylistValidationResult
+	 */
+	public String getMasterPlaylistValidationResult() {
+		return masterPlaylistValidationResult;
+	}
+
+	/**
+	 * @param masterPlaylistValidationResult the masterPlaylistValidationResult to set
+	 */
+	public void setMasterPlaylistValidationResult(
+			String masterPlaylistValidationResult) {
+		this.masterPlaylistValidationResult = masterPlaylistValidationResult;
+	}
+
+	/**
+	 * @return the mediaPlaylistValidationResult
+	 */
+	public String getMediaPlaylistValidationResult() {
+		return mediaPlaylistValidationResult;
+	}
+
+	/**
+	 * @param mediaPlaylistValidationResult the mediaPlaylistValidationResult to set
+	 */
+	public void setMediaPlaylistValidationResult(
+			String mediaPlaylistValidationResult) {
+		this.mediaPlaylistValidationResult = mediaPlaylistValidationResult;
+	}
 	
 }
