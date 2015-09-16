@@ -19,50 +19,50 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 
 	public void validate(List<String> contentList, StringBuilder sb, String mediaPlaylistURI) {
 		sb.append("******** Starting validation of the media playlist "+mediaPlaylistURI+" *********");
-		sb.append("\n\r");
+		sb.append("\r\n");
 		
 		long EXT_X_VERSION = -1;
 		
 		if(CollectionUtils.isNotEmpty(contentList)) {
 			if(!(contentList.get(0).equals(Constants.EXTM3U))) {
 				sb.append("Master playlist is missing the starting mandatory element : "+Constants.EXTM3U);
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			if(CommonUtils.hasDuplicate(contentList, Constants.EXTM3U)) {
 				sb.append("Media playlist contains duplicate "+Constants.EXTM3U+" elements");
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			Matcher matchEXTM3U = Constants.MATCH_EXTM3U.matcher(contentList.get(0));
 			if(!matchEXTM3U.matches()) {
 				sb.append("The starting element "+Constants.EXTM3U+" is in incorrect format");
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			if(!(StringUtils.join(contentList).contains(Constants.EXT_X_VERSION))) {
 				sb.append("Media playlist is missing the required element: "+Constants.EXT_X_VERSION);
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			if(CommonUtils.hasDuplicate(contentList, Constants.EXT_X_VERSION)) {
 				sb.append("Media playlist contains duplicate "+Constants.EXT_X_VERSION+" elements");
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 						
 			if(!(StringUtils.join(contentList).contains(Constants.EXT_X_TARGETDURATION))) {
 				sb.append("Media playlist is missing the required element: "+Constants.EXT_X_TARGETDURATION);
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			if(CommonUtils.hasDuplicate(contentList, Constants.EXT_X_TARGETDURATION)) {
 				sb.append("Media playlist contains duplicate "+Constants.EXT_X_TARGETDURATION+" elements");
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			if(!(StringUtils.join(contentList).contains(Constants.EXTINF))) {
 				sb.append("Media playlist is missing the required element: "+Constants.EXTINF);
-				sb.append("\n\r");
+				sb.append("\r\n");
 			}
 			
 			//TODO: Implement rule: The EXT-X-MEDIA-SEQUENCE tag MUST appear before the first Media Segment in the Playlist.
@@ -76,7 +76,7 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 					Matcher matchEXT_X_VERSION = Constants.MATCH_EXT_X_VERSION.matcher(lineContent);
 					if(!matchEXT_X_VERSION.matches()) {
 						sb.append(Constants.EXT_X_VERSION+" is in incorrect format");
-						sb.append("\n\r");
+						sb.append("\r\n");
 					}
 				}
 								
@@ -84,7 +84,7 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 					Matcher matchEXT_X_TARGETDURATION = Constants.MATCH_EXT_X_TARGETDURATION.matcher(lineContent);
 					if(!matchEXT_X_TARGETDURATION.matches()) {
 						sb.append(Constants.EXT_X_TARGETDURATION+" is in incorrect format");
-						sb.append("\n\r");
+						sb.append("\r\n");
 					}
 				}
 				
@@ -92,7 +92,7 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 					Matcher matchEXT_X_MEDIA_SEQUENCE = Constants.MATCH_EXT_X_MEDIA_SEQUENCE.matcher(lineContent);
 					if(!matchEXT_X_MEDIA_SEQUENCE.matches()) {
 						sb.append(Constants.EXT_X_MEDIA_SEQUENCE+" is in incorrect format");
-						sb.append("\n\r");
+						sb.append("\r\n");
 					}
 				}
 				
@@ -100,17 +100,17 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 					Matcher matchMATCH_EXTINF = Constants.MATCH_EXTINF.matcher(lineContent);
 					if(!matchMATCH_EXTINF.matches()) {
 						sb.append(Constants.EXTINF+" is in incorrect format");
-						sb.append("\n\r");
+						sb.append("\r\n");
 					}
 					
 					if(contentList.get(i+1).startsWith("#") || !contentList.get(i+1).endsWith(".ts")) {
 						sb.append("Media stream file (.ts) is missing following element "+Constants.MATCH_EXT_X_STREAM_INF);
-						sb.append("\n\r");
+						sb.append("\r\n");
 					} else {
 						Matcher matchEXTINF_STREAM_URI = Constants.MATCH_EXTINF_STREAM_URI.matcher(contentList.get(i+1));
 						if(!matchEXTINF_STREAM_URI.matches()) {
 							sb.append("Media stream file name "+contentList.get(i+1)+" is in incorrect format");
-							sb.append("\n\r");
+							sb.append("\r\n");
 						}
 					}
 				}
@@ -118,13 +118,14 @@ public class MediaPlaylistValidator implements PlaylistValidator {
 			
 			if(!(contentList.get(contentList.size()-1).equals(Constants.EXT_X_ENDLIST))) {
 				sb.append("Media playlist is missing the ending tag: "+Constants.EXT_X_ENDLIST);
+				sb.append("\r\n");
 			}
 			
 		}
 		sb.append("******** Validation of the media playlist ends *********");
-		sb.append("\n\r");
-		sb.append("\n\r");
-		sb.append("\n\r");
+		sb.append("\r\n");
+		sb.append("\r\n");
+		sb.append("\r\n");
 	}
 
 }
