@@ -41,14 +41,14 @@ public class Constants {
 	public static final Pattern MATCH_EXT_X_MEDIA_SEQUENCE = Pattern.compile("^[A-Z0-9#-:]+$");
 	
 	/** Regex to match the EXTINF element in master playlist. */
-	public static final Pattern MATCH_EXTINF = Pattern.compile("^[A-Za-z0-9#:, ]+$");
+	public static final Pattern MATCH_EXTINF = Pattern.compile("^[A-Za-z0-9#:,. ]+$");
 	
 	//TODO: improve this regex to check the after dot extension
 	/** Regex to match the stream uri element following the EXTINF element. */
 	public static final Pattern MATCH_EXTINF_STREAM_URI = Pattern.compile("^[A-Za-z0-9-_.]+$");
 	
 	/** Regex to match the EXT-X-VERSION element. */
-	public static final Pattern MATCH_EXT_X_VERSION = Pattern.compile("^[A-Z0-9#:]+$");
+	public static final Pattern MATCH_EXT_X_VERSION = Pattern.compile("^[A-Z0-9-#:]+$");
 
 
 	
