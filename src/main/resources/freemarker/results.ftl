@@ -1,31 +1,15 @@
 <#include "hpa.ftl"/>
 <#assign title="Results"/>
 <@page scripts>
-    <p>Wired Transfer of <b>$${upload.amount}</b> is submitted to policy <b>${upload.policyNumber}</b></p>
+    <p>The master and media streams have been validated. The validation results are available at following location.</p>
     <table style="text-align: left" class="hparesults">
       <tr>
-        <th>Policy #:</th>
-        <td>${upload.policyNumber}</td>
+        <th>Master Playlist Validation Results:</th>
+        <td>${upload.masterPlaylistValidationResult}</td>
       </tr>
       <tr>
-        <th>Company Code:</th>
-        <td>${companyName}</td>
-      </tr>
-      <tr>
-        <th>1035 Exchange Proceeds:</th>
-        <td>${upload.isPayment1035ExchangeProceeds?string("Yes", "No")}</td>
-      </tr>
-      <tr>
-        <th>Amount:</th>
-        <td>$${upload.amount}</td>
-      </tr>
-      <tr>
-        <th>Effective Date:</th>
-        <td>${upload.effectiveDate?string('MM/dd/yyyy')}</td>
-      </tr>
-      <tr>
-        <th>Remitter Relationship:</th>
-        <td>${valueLookup.describe("HPA_RemitterRelationsToCase", upload.remitterRelationshipToCase)}</td>
+        <th>Media Playlist Validation Results:</th>
+        <td>${upload.mediaPlaylistValidationResult}</td>
       </tr>
     </table>
     <br/>
