@@ -1,12 +1,6 @@
 <#include "hpa.ftl"/>
-
-<#-- Only include dropzone if a supported browser was detected. -->
-<#assign scripts=[]/>
-<#if supportsDropzone>
-  <#assign scripts=['/js/hpa.upload.js']/>
-</#if>
   
-<@page scripts>
+<@page>
   
   <form method="post" enctype="multipart/form-data">
     <@row ["50%", "50%"]>

@@ -69,9 +69,9 @@
   <bean id="fieldInfo" class="com.psu.hpa.application.FieldInfo" />
     
   <!-- Messages -->
-<!--   <bean id="messageSource" class="com.psu.hpa.messagesource.HPAMessageSource">
+  <bean id="messageSource" class="com.psu.hpa.messagesource.HPAMessageSource">
     <property name="basename" value="classpath:/messages"/>
-  </bean> -->
+  </bean>
      
   <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
     <property name="host" value="${email.host}"/>
