@@ -1,10 +1,8 @@
 package com.psu.hpa;
 
+import java.io.IOException;
 import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -19,7 +17,7 @@ import javax.mail.internet.MimeMultipart;
 
 public class ErrorMailSender {
 	
-   public static void sendEmail(String recipientEmail, String filename) {
+   public static void sendEmail(String recipientEmail, String[] attachFiles) {
       String from = "kumar.vijay281@gmail.com";
       final String username = "pendingstatus.notification@gmail.com";
       final String password = "pendingtestpassword";
@@ -43,14 +41,26 @@ public class ErrorMailSender {
          message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
          message.setSubject("HLS Stream Validation Results");
          BodyPart messageBodyPart = new MimeBodyPart();
+         messageBodyPart.setContent(message, "text/html");
          messageBodyPart.setText("Please find attached the stream validation result logs");
          Multipart multipart = new MimeMultipart();
          multipart.addBodyPart(messageBodyPart);
-         messageBodyPart = new MimeBodyPart();
-         DataSource source = new FileDataSource(filename);
-         messageBodyPart.setDataHandler(new DataHandler(source));
-         messageBodyPart.setFileName(filename);
-         multipart.addBodyPart(messageBodyPart);
+         
+         // adds attachments
+         if (attachFiles != null && attachFiles.length > 0) {
+             for (String filePath : attachFiles) {
+                 MimeBodyPart attachPart = new MimeBodyPart();
+  
+                 try {
+                     attachPart.attachFile(filePath);
+                 } catch (IOException ex) {
+                     ex.printStackTrace();
+                 }
+  
+                 multipart.addBodyPart(attachPart);
+             }
+         }
+         
          message.setContent(multipart);
          Transport.send(message);
       } catch (MessagingException e) {

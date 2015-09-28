@@ -18,6 +18,15 @@ public class Constants {
 	/** EXTINF */
 	public static final String EXTINF = "#EXTINF";
 	
+	/** EXT-X-BYTERANG */
+	public static final String EXT_X_BYTERANGE = "#EXT-X-BYTERANGE";
+	
+	/** EXT-X-KEY */
+	public static final String EXT_X_KEY = "#EXT-X-KEY";
+	
+	/** EXT-X-I-FRAMES-ONLY */
+	public static final String EXT_X_I_FRAMES_ONLY = "#EXT-X-I-FRAMES-ONLY";
+	
 	/** EXT-X-VERSION */
 	public static final String EXT_X_VERSION = "#EXT-X-VERSION";
 	
