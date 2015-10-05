@@ -14,7 +14,7 @@
       <tr/>
       <#if upload.userEmail?? && upload.userEmail?has_content>
 	  <tr>
-        <td colspan="2">The validation logs have also attached to the email and sent at address ${upload.userEmail}</td>
+        <td colspan="2">The validation results have also attached to the email and sent at address ${upload.userEmail}</td>
       </tr>
       </#if>
     </table>

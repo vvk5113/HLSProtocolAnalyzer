@@ -8,7 +8,7 @@ public enum ErrorType {
 
 	MISSING_STREAM_FILE("Missing Stream File"),
 	
-	MISSING_SEGMENT_FILE("Missing Segment File"),
+	MISSING_SEGMENT_FILE("Missing Media Playlist File"),
 	
 	INCORRECT_FORMAT("Incorrect Format"),
 	

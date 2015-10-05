@@ -95,7 +95,9 @@ public class MainController extends SessionUploadFormController {
 	
 	/** Relative URL of the results page. */
 	public static final String ERROR_PAGE = "internal_server_error.jsp";
-
+	
+	public static long masterPlaylistErrSeqNumber = 1;
+	
 	/** The default validator. */
 	@Autowired
 	private Validator defaultValidator;
@@ -213,18 +215,17 @@ public class MainController extends SessionUploadFormController {
 			mediaPlaylistValidationErrorFileWriter = new FileWriter(mediaPlaylistValidationErrorFile);
 			CommonUtils.writeCSVFileHeaders(masterPlaylistValidationErrorFileWriter, "Error Number", "Error Type", "File Name", "Error Details");
 			CommonUtils.writeCSVFileHeaders(mediaPlaylistValidationErrorFileWriter, "Error Number", "Error Type", "File Name", "Error Details");
-			
-			StringBuilder masterPlaylistSB = new StringBuilder();
-			StringBuilder mediaPlaylistSB = new StringBuilder();		
+	
 			String masterPlaylistStreamURL = upload.getStreamURL();		
 			String masterStreamURI = masterPlaylistStreamURL.substring(0, masterPlaylistStreamURL.lastIndexOf("/")+1);
 			String masterPlaylistName = masterPlaylistStreamURL.substring(masterPlaylistStreamURL.lastIndexOf("/")+1, masterPlaylistStreamURL.length());
 			List<String> masterPlaylistContents = null;
+
 			try {
 				masterPlaylistContents = CommonUtils.readFile(new URL(masterPlaylistStreamURL));
 			} catch(FileNotFoundException fnfe) {
 				String errorDetails = "Master playlist file "+masterPlaylistName+" is missing";
-				CommonUtils.writeToCSVFile(masterPlaylistValidationErrorFileWriter, 1, ErrorType.MISSING_SEGMENT_FILE, masterPlaylistName, errorDetails);
+				CommonUtils.writeToCSVFile(masterPlaylistValidationErrorFileWriter, masterPlaylistErrSeqNumber++, ErrorType.MISSING_SEGMENT_FILE, masterPlaylistName, errorDetails);
 				fnfe.printStackTrace();
 			} catch(Exception ex) {
 				ex.printStackTrace();
@@ -243,7 +244,7 @@ public class MainController extends SessionUploadFormController {
 							mediaPlaylistContents = CommonUtils.readFile(new URL(mediaPlayListStreamURL));
 						} catch(FileNotFoundException fnfe) {
 							String errorDetails = "Media playlist file "+lineContent+" is missing";
-							CommonUtils.writeToCSVFile(masterPlaylistValidationErrorFileWriter, 1, ErrorType.MISSING_SEGMENT_FILE, masterPlaylistName, errorDetails);
+							CommonUtils.writeToCSVFile(masterPlaylistValidationErrorFileWriter, masterPlaylistErrSeqNumber++, ErrorType.MISSING_SEGMENT_FILE, masterPlaylistName, errorDetails);
 							fnfe.printStackTrace();
 						} catch(Exception ex) {
 							ex.printStackTrace();
@@ -256,24 +257,17 @@ public class MainController extends SessionUploadFormController {
 				}	
 			
 				log.info("******** Validating of the master playlist ends *********");
+								
+				masterPlaylistValidationErrorFileWriter.flush();
+				masterPlaylistValidationErrorFileWriter.close();
 				
-				/*String dirPath = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result");
-				File fileDir = new File(dirPath);
-				fileDir.mkdirs();
-				File masterPlaylistValidationLogFile = new File(fileDir, "MasterPlaylistValidation.csv");
-				File mediaPlaylistValidationLogFile = new File(fileDir, "MediaPlaylistValidation.csv");
-				
-				FileUtils.writeStringToFile(masterPlaylistValidationLogFile, masterPlaylistSB.toString());
-				FileUtils.writeStringToFile(mediaPlaylistValidationLogFile, mediaPlaylistSB.toString());
-				*/
+				mediaPlaylistValidationErrorFileWriter.flush();
+				mediaPlaylistValidationErrorFileWriter.close();
 				
 				if(StringUtils.isNotBlank(upload.getUserEmail())) {
 					String[] attachFiles = new String[2];
 			        attachFiles[0] = masterPlaylistValidationErrorFile;
 			        attachFiles[1] = mediaPlaylistValidationErrorFile;
-			        
-			        //attachFiles[0] = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MasterPlaylistValidation.csv");
-			        //attachFiles[1] = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MediaPlaylistValidation.csv");
 
 			       	ErrorMailSender.sendEmail(upload.getUserEmail(), attachFiles);
 				}
@@ -286,13 +280,7 @@ public class MainController extends SessionUploadFormController {
 		} catch(Exception ex) {
 			ex.printStackTrace();
 			return new RedirectView(ERROR_PAGE);
-		} finally {
-			masterPlaylistValidationErrorFileWriter.flush();
-			masterPlaylistValidationErrorFileWriter.close();
-			
-			mediaPlaylistValidationErrorFileWriter.flush();
-			mediaPlaylistValidationErrorFileWriter.close();
-		}
+		} 
 
 		result.reject("GenericError");
 		return discardBadFieldsOrGetErrorRedirect(request, upload, result, redirectAttrs);
