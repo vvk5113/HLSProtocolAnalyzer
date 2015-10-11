@@ -1,11 +1,9 @@
 package com.psu.hpa.controllers;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,9 +92,7 @@ public class MainController extends SessionUploadFormController {
 	
 	/** Relative URL of the results page. */
 	public static final String ERROR_PAGE = "internal_server_error.jsp";
-	
-	public static long masterPlaylistErrSeqNumber = 1;
-	
+		
 	/** The default validator. */
 	@Autowired
 	private Validator defaultValidator;
@@ -115,8 +110,8 @@ public class MainController extends SessionUploadFormController {
 	private MasterPlaylistValidator masterPlaylistValidator;
 	
 	/** The play list validator. */
-	@Autowired
-	private MediaPlaylistValidator mediaPlaylistValidator;
+	//@Autowired
+	//private MediaPlaylistValidator mediaPlaylistValidator;
 
 	@InitBinder(MODEL_UPLOAD)
 	public void initUploadFormBinder(WebDataBinder binder) {
@@ -192,7 +187,7 @@ public class MainController extends SessionUploadFormController {
 			@Valid @ModelAttribute(MODEL_UPLOAD) UploadModel upload,
 			BindingResult result,
 			@PathVariable("id") GUID id,
-			RedirectAttributes redirectAttrs) throws IOException, ImageProcessingException {
+			RedirectAttributes redirectAttrs) throws Exception {
 		
 		// Redirect back to this form on error.
 		View errorRedirect = discardBadFieldsOrGetErrorRedirect(request, upload, result, redirectAttrs);
@@ -200,8 +195,11 @@ public class MainController extends SessionUploadFormController {
 			return errorRedirect;
 		}
 		
+		long masterPlaylistErrSeqNumber = 1;
+		
 		FileWriter masterPlaylistValidationErrorFileWriter = null;
 		FileWriter mediaPlaylistValidationErrorFileWriter = null;
+		MediaPlaylistValidator mediaPlaylistValidator = new MediaPlaylistValidator();
 		
 		try{
 			
@@ -209,8 +207,8 @@ public class MainController extends SessionUploadFormController {
 			File fileDir = new File(dirPath);
 			fileDir.mkdirs();
 			
-			String masterPlaylistValidationErrorFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MasterPlaylistValidation.csv");
-			String mediaPlaylistValidationErrorFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MediaPlaylistValidation.csv");
+			String masterPlaylistValidationErrorFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MasterPlaylistValidationResult.csv");
+			String mediaPlaylistValidationErrorFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MediaPlaylistValidationResult.csv");
 			masterPlaylistValidationErrorFileWriter = new FileWriter(masterPlaylistValidationErrorFile);
 			mediaPlaylistValidationErrorFileWriter = new FileWriter(mediaPlaylistValidationErrorFile);
 			CommonUtils.writeCSVFileHeaders(masterPlaylistValidationErrorFileWriter, "Error Number", "Error Type", "File Name", "Error Details");
