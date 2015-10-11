@@ -1,7 +1,7 @@
 <#include "hpa.ftl"/>
 <#assign title="Validation Results"/>
 <@page scripts>
-    <p>The master and media streams have been validated. The validation results are available at following location.</p>
+    <p>The master and media playlists have been validated. The validation results are available at following location.</p>
     <table style="text-align: left" class="hparesults">
       <tr>
         <th>Master Playlist Validation Results:</th>

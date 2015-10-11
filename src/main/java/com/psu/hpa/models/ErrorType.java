@@ -12,7 +12,11 @@ public enum ErrorType {
 	
 	INCORRECT_FORMAT("Incorrect Format"),
 	
+	INCORRECT_SEQUENCE("Incorrect Sequence"),
+	
 	DUPLICATE_TAG("Duplicate Tag"),
+	
+	INVALID_TAG("Invalid Tag"),
 	
 	FUNCTIONAL_TAG("Functional");
 	

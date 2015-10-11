@@ -28,10 +28,11 @@
         </div>
         <#nested/>
       </div>
-      <#if errors??>
+      <#-- <#if errors??>
         <@submitNavigationWarning errors/>
       </#if>
       <@busyPopup/>
+	  -->
     </div>
   </body>
 </html>
@@ -93,6 +94,8 @@
     </div>
   </div>
 </#macro>
+
+
 
 <#--
  * modalBusyPopup

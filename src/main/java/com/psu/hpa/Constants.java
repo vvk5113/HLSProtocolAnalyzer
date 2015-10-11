@@ -1,5 +1,8 @@
 package com.psu.hpa;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Constants {
@@ -58,30 +61,21 @@ public class Constants {
 	
 	/** Regex to match the EXT-X-VERSION element. */
 	public static final Pattern MATCH_EXT_X_VERSION = Pattern.compile("^[A-Z0-9-#:]+$");
-
-
 	
-    /** Transaction result code for successful hpa submit. */
-    public static final int TRANS_RESULT_SUCCESS = 4;
-
-    /** Transaction result code with information. */
-    public static final int TRANS_RESULT_SUCCESS_WITH_INFORMATION = 2;
-
-    /** Transaction result code failure. */
-    public static final int TRANS_RESULT_FAILURE = 5;
+	public static final Map<String, String> VALID_MEDIA_TAGS;
+    static {
+    	Map<String, String> validMediaTags = new HashMap<String, String>();
+    	validMediaTags.put("#EXTM3U", "#EXTM3U");
+    	validMediaTags.put("#EXT-X-STREAM-INF", "#EXT-X-STREAM-INF");
+		validMediaTags.put("#EXT-X-TARGETDURATION", "#EXT-X-TARGETDURATION");
+		validMediaTags.put("#EXT-X-MEDIA-SEQUENCE", "#EXT-X-MEDIA-SEQUENCE");
+		validMediaTags.put("#EXTINF", "#EXTINF");
+		validMediaTags.put("#EXT-X-BYTERANGE", "#EXT-X-BYTERANGE");
+		validMediaTags.put("#EXT-X-KEY", "#EXT-X-KEY");
+		validMediaTags.put("#EXT-X-I-FRAMES-ONLY", "#EXT-X-I-FRAMES-ONLY");
+		validMediaTags.put("#EXT-X-VERSION", "#EXT-X-VERSION");
+		validMediaTags.put("#EXT-X-ENDLIST", "#EXT-X-ENDLIST");
+    	VALID_MEDIA_TAGS = Collections.unmodifiableMap(validMediaTags);
+    }
 	
-    /** ResultInfoSeverity success. */
-    public static final String MESSAGE_SEVERITY_SUCCESS = "1";
-
-    /** ResultInfoSeverity severe. */
-    public static final String MESSAGE_SEVERITY_SEVERE = "2";
-
-    /** ResultInfoSeverity warning. */
-    public static final String MESSAGE_SEVERITY_WARNING = "3";
-    
-    /** FinActivityType for 1035 exchange proceeds. */
-	public static final String FIN_ACTIVITY_TYPE_1035_EXCHANGE = "192";
-	
-	/** FinActivityType for Non 1035 exchange proceeds. */
-	public static final String FIN_ACTIVITY_TYPE_NOT_1035_EXCHANGE = "7";
 }

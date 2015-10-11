@@ -20,7 +20,7 @@ public class MasterPlaylistValidator {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	public static long seqNumber = 1;
+	public long seqNumber = 1;
 
 	public void validate(List<String> contentList, FileWriter fileWriter, String masterPlaylistURI) throws IOException {
 		
@@ -50,8 +50,19 @@ public class MasterPlaylistValidator {
 			}
 			
 			for(int i=0; i<contentList.size(); i++) {
-				if(contentList.get(i).contains(Constants.EXT_X_STREAM_INF)) {
-					Matcher matchEXT_X_STREAM_INF = Constants.MATCH_EXT_X_STREAM_INF.matcher(contentList.get(i));
+				String lineContent = contentList.get(i);
+				
+				if(lineContent.startsWith("#") && !(lineContent.endsWith(".m3u8"))) {
+					String mediaTag = lineContent.contains(":") ? lineContent.substring(0, lineContent.indexOf(":")) : lineContent;
+					
+					if(!(Constants.VALID_MEDIA_TAGS.containsValue(mediaTag.trim()))) {
+						String errorDetails = "Media playlist contains invalid and un-recognized tage "+mediaTag;
+						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INVALID_TAG, masterPlaylistURI, errorDetails);
+					}
+				}
+				
+				if(lineContent.contains(Constants.EXT_X_STREAM_INF)) {
+					Matcher matchEXT_X_STREAM_INF = Constants.MATCH_EXT_X_STREAM_INF.matcher(lineContent);
 					if(!matchEXT_X_STREAM_INF.matches()) {
 						String errorDetails = Constants.EXT_X_STREAM_INF+" is in incorrect format";
 						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INCORRECT_FORMAT, masterPlaylistURI, errorDetails);
@@ -60,7 +71,6 @@ public class MasterPlaylistValidator {
 					if(contentList.get(i+1).startsWith("#") || !contentList.get(i+1).endsWith(".m3u8")) {
 						String errorDetails = Constants.EXT_X_STREAM_INF+" uri missing";
 						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.MISSING_SEGMENT_FILE, masterPlaylistURI, errorDetails);
-						
 					} else {
 						Matcher matchEXT_X_STREAM_INF_URI = Constants.MATCH_EXT_X_STREAM_INF_URI.matcher(contentList.get(i+1));
 						if(!matchEXT_X_STREAM_INF_URI.matches()) {

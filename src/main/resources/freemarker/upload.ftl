@@ -5,7 +5,7 @@
   <form method="post" enctype="multipart/form-data">
     <@row ["50%", "50%"]>
       <@cell>
-        <@label path="upload.streamURL">Stream URL</@label>
+        <@label path="upload.streamURL">Stream URL *</@label>
         <@formInput path="upload.streamURL"/>
       </@cell>
     </@row>
@@ -23,7 +23,7 @@
   
     <@row ["50%", "50%"]>
       <@cell>
-        <p>All fields are required.</p>
+		<p>*=Required Field</p>
       </@cell>
       <@cell>
         <div class="pageButtons">

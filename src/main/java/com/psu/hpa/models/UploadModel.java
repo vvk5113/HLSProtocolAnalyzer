@@ -1,16 +1,10 @@
 package com.psu.hpa.models;
 
 import java.io.Serializable;
-import java.util.Date;
-
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 import com.psu.hpa.validators.annotations.EmailFormat;
-import com.psu.hpa.util.DateUtils;
-import com.psu.hpa.validators.annotations.NotInFuture;
+import com.psu.hpa.validators.annotations.URLFormat;
 
 /**
  * Data model for HPA Stream URL Submission.
@@ -21,43 +15,19 @@ public class UploadModel implements Serializable {
 	private static final long serialVersionUID = 43505303873271983L;
 	
 	/** The stream url. */
-	@NotBlank
-	@Size(max=100)
+	@URLFormat
 	private String streamURL;
 	
-	/** The Agent email. */
+	/** The user email. */
 	@Size(max=60)
 	@EmailFormat
 	private String userEmail;
 
-	/** The effective date. */
-	@NotNull
-	@NotInFuture
-	private Date effectiveDate;
-	
 	/** The master playlist validation result. */
 	private String masterPlaylistValidationResult;
 	
 	/** The media playlist validation result. */
 	private String mediaPlaylistValidationResult;
-
-	public UploadModel() {
-		effectiveDate = new Date();
-	}
-
-	/**
-	 * Gets the effective date.
-	 *
-	 * @return the effective date
-	 */
-	public Date getEffectiveDate() { return effectiveDate; }
-
-	/**
-	 * Sets the effective date.
-	 *
-	 * @param effectiveDate the new effective date
-	 */
-	public void setEffectiveDate(Date effectiveDate) { this.effectiveDate = effectiveDate; }
 
 	/**
 	 * @see java.lang.Object#toString()
@@ -65,8 +35,7 @@ public class UploadModel implements Serializable {
 	@Override
 	public String toString() {
 		return "StartModel [streamURL=" + streamURL
-				+ ", userEmail=" + userEmail
-				+ ", effectiveDate=" + effectiveDate + "]";
+				+ ", userEmail=" + userEmail + "]";
 	}
 
 	/**
@@ -78,8 +47,6 @@ public class UploadModel implements Serializable {
 		int result = 1;
 		result = prime * result + ((streamURL == null) ? 0 : streamURL.hashCode());
 		result = prime * result + ((userEmail == null) ? 0 : userEmail.hashCode());
-		result = prime * result
-				+ ((effectiveDate == null) ? 0 : effectiveDate.hashCode());
 		return result;
 	}
 
@@ -110,13 +77,6 @@ public class UploadModel implements Serializable {
 				return false;
 			}
 		} else if (!userEmail.equals(other.userEmail)) {
-			return false;
-		}
-		if (effectiveDate == null) {
-			if (other.effectiveDate != null) {
-				return false;
-			}
-		} else if (!DateUtils.datesEqual(effectiveDate, other.effectiveDate)) {
 			return false;
 		}
 		return true;

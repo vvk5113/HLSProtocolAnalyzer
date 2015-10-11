@@ -19,8 +19,8 @@ public class ErrorMailSender {
 	
    public static void sendEmail(String recipientEmail, String[] attachFiles) {
       String from = "kumar.vijay281@gmail.com";
-      final String username = "pendingstatus.notification@gmail.com";
-      final String password = "pendingtestpassword";
+      final String username = "hls.analyzer@gmail.com";
+      final String password = "HLSanalyzertest";
       String host = "smtp.gmail.com";
       Properties props = new Properties();
       props.put("mail.smtp.auth", "true");
@@ -39,10 +39,10 @@ public class ErrorMailSender {
          Message message = new MimeMessage(session);
          message.setFrom(new InternetAddress(from));
          message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-         message.setSubject("HLS Stream Validation Results");
+         message.setSubject("Media Stream Validation Results");
          BodyPart messageBodyPart = new MimeBodyPart();
          messageBodyPart.setContent(message, "text/html");
-         messageBodyPart.setText("Please find attached the stream validation result logs");
+         messageBodyPart.setText("Please find attached the media stream validation results. \n\n\n\n\nPlease do NOT response to this email, it has been sent automatically from an unmonitored mailbox.");
          Multipart multipart = new MimeMultipart();
          multipart.addBodyPart(messageBodyPart);
          

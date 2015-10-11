@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -12,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -24,14 +26,18 @@ public class MediaPlaylistValidator {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	public static long seqNumber = 1;
-
+	public long seqNumber = 1;
+	
 	public void validate(List<String> contentList, FileWriter fileWriter, String mediaPlaylistURI, String masterStreamURI) throws IOException {
 		log.info("******** Starting validation of the media playlist "+mediaPlaylistURI+" *********");
 		
 		if(CollectionUtils.isNotEmpty(contentList)) {
 			
 			BigDecimal EXT_X_TARGETDURATION_VALUE = null;
+			
+			BigDecimal EXT_X_MEDIA_SEQUENCE_VALUE = new BigDecimal("0");
+			
+			List<String> mediaFiles = new ArrayList<String>();
 			
 			if(!(contentList.get(0).equals(Constants.EXTM3U))) {
 				String errorDetails = "Master playlist is missing the starting mandatory tag : "+Constants.EXTM3U;
@@ -59,6 +65,9 @@ public class MediaPlaylistValidator {
 				hasDuplicate_EXT_X_VERSION = true;
 				String errorDetails = "Media playlist contains duplicate "+Constants.EXT_X_VERSION+" tags";
 				CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.DUPLICATE_TAG, mediaPlaylistURI, errorDetails);
+				
+				String errorDetails1 = "Media playlist does not contains the correct version number";
+				CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.DUPLICATE_TAG, mediaPlaylistURI, errorDetails1);
 			}
 						
 			if(!(StringUtils.join(contentList).contains(Constants.EXT_X_TARGETDURATION))) {
@@ -81,8 +90,16 @@ public class MediaPlaylistValidator {
 			for(int i=0; i<contentList.size(); i++) {
 				String lineContent = contentList.get(i);
 				
+				if(lineContent.startsWith("#") && !(lineContent.endsWith(".ts"))) {
+					String mediaTag = lineContent.contains(":") ? lineContent.substring(0, lineContent.indexOf(":")) : lineContent;
+					if(!(Constants.VALID_MEDIA_TAGS.containsValue(mediaTag.trim()))) {
+						String errorDetails = "Media playlist contains invalid and un-recognized tage "+mediaTag;
+						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INVALID_TAG, mediaPlaylistURI, errorDetails);
+					}
+				}
+				
 				if(lineContent.contains(Constants.EXT_X_VERSION) && !hasDuplicate_EXT_X_VERSION) {
-					validate_EXT_X_VERSION(contentList, lineContent, fileWriter, mediaPlaylistURI, seqNumber);
+					validate_EXT_X_VERSION(contentList, lineContent, fileWriter, mediaPlaylistURI, seqNumber++);
 				}
 								
 				if(lineContent.contains(Constants.EXT_X_TARGETDURATION)) {
@@ -102,6 +119,9 @@ public class MediaPlaylistValidator {
 					if(!matchEXT_X_MEDIA_SEQUENCE.matches()) {
 						String errorDetails = Constants.EXT_X_MEDIA_SEQUENCE+" is in incorrect format";
 						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INCORRECT_FORMAT, mediaPlaylistURI, errorDetails);
+					} else {
+						String EXT_X_MEDIA_SEQUENCE_VALUE1 = lineContent.substring(lineContent.indexOf(":")+1, lineContent.length());
+						EXT_X_MEDIA_SEQUENCE_VALUE = StringUtils.isNotBlank(EXT_X_MEDIA_SEQUENCE_VALUE1) ? new BigDecimal(EXT_X_MEDIA_SEQUENCE_VALUE1) : new BigDecimal("0");
 					}
 				}
 				
@@ -118,9 +138,11 @@ public class MediaPlaylistValidator {
 							if(!(contentList.get(i+1).startsWith("#")) && contentList.get(i+1).endsWith(".ts")) {
 								String errorDetails = "The EXTINF duration of Media Segment ("+contentList.get(i+1)+") must be less than or equal to the target duration "+Constants.EXT_X_TARGETDURATION;
 								CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.FUNCTIONAL_TAG, mediaPlaylistURI, errorDetails);
+								
+								//String errorDetails1 = "The EXTINF duration of Media Segment ("+contentList.get(i+1)+") exceeds the target duration "+Constants.EXT_X_TARGETDURATION+" by "+EXTINF_DURATION_VALUE1.subtract(EXT_X_TARGETDURATION_VALUE)+" seconds";
+								//CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.FUNCTIONAL_TAG, mediaPlaylistURI, errorDetails1);
 							}
 						}
-						
 					}
 					
 					if(contentList.get(i+1).startsWith("#") || !contentList.get(i+1).endsWith(".ts")) {
@@ -131,6 +153,8 @@ public class MediaPlaylistValidator {
 						if(!matchEXTINF_STREAM_URI.matches()) {
 							String errorDetails = "Media stream file name "+contentList.get(i+1)+" is in incorrect format";
 							CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INCORRECT_FORMAT, mediaPlaylistURI, errorDetails);
+						} else {
+							mediaFiles.add(contentList.get(i+1));
 						}
 					}
 				}
@@ -141,7 +165,7 @@ public class MediaPlaylistValidator {
 					try {
 						transportStream = CommonUtils.readFile(new URL(transportStreamURL));
 					} catch(FileNotFoundException fnfe) {
-						String errorDetails = "Transport Stream file "+lineContent+" is missing";
+						String errorDetails = "Media (Transport Stream) file "+lineContent+" is missing";
 						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.MISSING_STREAM_FILE, mediaPlaylistURI, errorDetails);
 						fnfe.printStackTrace();
 					} catch(Exception ex) {
@@ -153,10 +177,19 @@ public class MediaPlaylistValidator {
 			
 			if(contentList.get(contentList.size()-1).contains(Constants.EXT_X_ENDLIST)) {
 				if(!(contentList.get(contentList.size()-1).equals(Constants.EXT_X_ENDLIST))) {
-					String errorDetails = "Media playlist contains the incorrect ending tag: "+contentList.get(contentList.size()-1);
-					CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INCORRECT_FORMAT, mediaPlaylistURI, errorDetails);
+					String errorDetails = "Media playlist is not correctly terminated by "+Constants.EXT_X_ENDLIST+" tag.";
+					CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.MISSING_TAG, mediaPlaylistURI, errorDetails);
 				}
 			}
+			
+			int j = 0;
+			for(String mediaFileName : mediaFiles) {
+				if(!(mediaFileName.contains(String.valueOf(EXT_X_MEDIA_SEQUENCE_VALUE.add(new BigDecimal(j++)))))) {
+					String errorDetails = "Media (Transport Stream) file "+mediaFileName+" is out of sequence.";
+					CommonUtils.writeToCSVFile(fileWriter, seqNumber, ErrorType.INCORRECT_SEQUENCE, mediaPlaylistURI, errorDetails);
+				}
+			}
+			
 			
 		}
 		log.info("******** Validation of the media playlist ends *********");
@@ -168,7 +201,6 @@ public class MediaPlaylistValidator {
 			String errorDetails = Constants.EXT_X_VERSION+" is in incorrect format";
 			CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.INCORRECT_FORMAT, mediaPlaylistURI, errorDetails);
 		} else {
-			//TODO: More rules need to be implemented for this from section "7. Protocol version compatibility"
 			String EXT_X_VERSION_VALUE = element.substring(element.indexOf(":")+1, element.length());
 			long EXT_X_VERSION_VALUE1 = StringUtils.isNotBlank(EXT_X_VERSION_VALUE) ? Long.parseLong(EXT_X_VERSION_VALUE) : -1;
 			
@@ -182,7 +214,7 @@ public class MediaPlaylistValidator {
 				if(lineContent.contains(Constants.EXTINF)) {
 					String EXTINFDuration = lineContent.substring(lineContent.indexOf(":")+1, lineContent.indexOf(","));
 					if((EXT_X_VERSION_VALUE1 >= 3) && !(EXTINFDuration.contains("."))) {
-						String errorDetails = "Media Playlist must include all EXTINF duration values as Floating-point values if "+Constants.EXT_X_VERSION+" value is 3 or higher. Value of "+EXTINFDuration+" for "+Constants.EXTINF+" is not valid.";
+						String errorDetails = "Media Playlist must include all EXTINF duration values as Floating-point values if "+Constants.EXT_X_VERSION+" value is 3 or higher. The integer value "+EXTINFDuration+" for "+Constants.EXTINF+" is not valid.";
 						CommonUtils.writeToCSVFile(fileWriter, seqNumber++, ErrorType.FUNCTIONAL_TAG, mediaPlaylistURI, errorDetails);
 					}
 				}
