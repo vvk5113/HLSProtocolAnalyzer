@@ -28,6 +28,8 @@ public class UploadModel implements Serializable {
 	
 	/** The media playlist validation result. */
 	private String mediaPlaylistValidationResult;
+	
+	private String guid;
 
 	/**
 	 * @see java.lang.Object#toString()
@@ -139,5 +141,21 @@ public class UploadModel implements Serializable {
 			String mediaPlaylistValidationResult) {
 		this.mediaPlaylistValidationResult = mediaPlaylistValidationResult;
 	}
+
+	/**
+	 * @return the guid
+	 */
+	public String getGuid() {
+		return guid;
+	}
+
+	/**
+	 * @param guid the guid to set
+	 */
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
+	
+	
 	
 }

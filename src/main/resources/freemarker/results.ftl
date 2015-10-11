@@ -21,6 +21,9 @@
     <br/>
     <div>
       <button type="button" data-inline="true" data-theme="b" data-icon="printer" onclick="window.print();">Print</button>
-      <a href="<@spring.url '/'/>" data-role="button" data-theme="b" data-inline="true">OK</a>
+	  &nbsp;
+      <a href="<@spring.url '/'/>" data-role="button" data-theme="b" data-inline="true">Ok</a>
+	  &nbsp;
+      <a href="<@spring.url '/${upload.guid}/download'/>" data-role="button" data-theme="b" data-inline="true">Download Results</a>
     </div>
 </@page>

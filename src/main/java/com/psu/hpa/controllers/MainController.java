@@ -1,9 +1,13 @@
 package com.psu.hpa.controllers;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,12 +15,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +174,65 @@ public class MainController extends SessionUploadFormController {
 
 		return "upload";
 	}
+	
+	@RequestMapping(value = "/download", method = RequestMethod.GET)
+    public String download(
+				HttpSession session,
+				ModelMap model,
+				@PathVariable("id") GUID id,
+				@ModelAttribute(MODEL_UPLOAD) UploadModel upload,
+				@RequestHeader("User-Agent") String userAgent,
+				HttpServletResponse response) {
+		
+		String masterPlaylistValidationErrorFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MasterPlaylistValidationResult.csv");
+		String mediaPlaylistValidationErrorFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/MediaPlaylistValidationResult.csv");
+		String validationResultsArchiveFile = session.getServletContext().getRealPath("/"+id+"/hls-stream-validation-result/HLSValidationResults.zip");
+		String[] ValidationResultFiles = {masterPlaylistValidationErrorFile, mediaPlaylistValidationErrorFile};
+		
+		compress(ValidationResultFiles, validationResultsArchiveFile);
+		
+        File file = new File (validationResultsArchiveFile);
+        
+        try {
+        	InputStream fileInputStream = new FileInputStream(file);
+            OutputStream output = response.getOutputStream();
+            response.reset();
+            response.setContentType("application/octet-stream");
+            response.setContentLength((int) (file.length()));
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+            IOUtils.copyLarge(fileInputStream, output);
+            output.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return "download";
+    }
+	
+
+    public void compress(String[] ValidationResultFiles, String validationResultsArchiveFile) {
+      try {
+    	  	byte[] buffer = new byte[1024];
+            FileOutputStream fos = new FileOutputStream(validationResultsArchiveFile);
+            ZipOutputStream zos = new ZipOutputStream(fos);
+
+            for (int i=0; i < ValidationResultFiles.length; i++) {
+                File srcFile = new File(ValidationResultFiles[i]);
+                FileInputStream fis = new FileInputStream(srcFile);
+                zos.putNextEntry(new ZipEntry(srcFile.getName()));
+                int length;
+                while ((length = fis.read(buffer)) > 0) {
+                    zos.write(buffer, 0, length);
+                }
+                zos.closeEntry();
+               fis.close();
+            }
+            zos.close();
+        }
+        catch (IOException ioe) {
+        	log.error("Error creating zip file: " + ioe);
+       }
+    }
+
 
 	/**
 	 * Handle a submit POST request.  Update the form attributes, and redirect to the requested page.
@@ -272,6 +339,8 @@ public class MainController extends SessionUploadFormController {
 				
 				upload.setMasterPlaylistValidationResult(masterPlaylistValidationErrorFile);
 				upload.setMediaPlaylistValidationResult(mediaPlaylistValidationErrorFile);
+				
+				upload.setGuid(id.urlRepresentation);
 				
 				return new RedirectView(RESULTS_URL);
 			}
