@@ -14,7 +14,6 @@ import org.springframework.web.servlet.support.BindStatus;
 import org.springframework.web.servlet.support.RequestContext;
 
 import com.psu.hpa.application.annotation.MaxLength;
-import com.psu.hpa.format.annotation.CurrencyFormat;
 
 /**
  * Tool for retrieving annotations from the model objects.
@@ -64,12 +63,6 @@ public class FieldInfo {
 						Size size = AnnotationUtils.getAnnotation(field, Size.class);
 						if(size != null) {
 							result = size.max();
-						}
-					}
-					if(result == -1) {
-						CurrencyFormat currencyFormat = AnnotationUtils.getAnnotation(field, CurrencyFormat.class);
-						if(currencyFormat != null) {
-							result = currencyFormat.max();
 						}
 					}
 					if(result == -1) {

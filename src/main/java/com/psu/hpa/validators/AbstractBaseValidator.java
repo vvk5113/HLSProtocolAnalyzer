@@ -1,7 +1,6 @@
 package com.psu.hpa.validators;
 
 import com.psu.hpa.messagesource.HPAMessageSource;
-import com.psu.hpa.util.RatifiedDate;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
@@ -83,12 +82,6 @@ public abstract class AbstractBaseValidator implements Validator {
 		this.calendar2 = Calendar.getInstance();
 		this.dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 	}
-
-	@Override
-	abstract public boolean supports(Class<?> clazz);
-
-	@Override
-	abstract public void validate(Object target, Errors errors);
 
 	/**
 	 * Validate required fields.
@@ -223,51 +216,6 @@ public abstract class AbstractBaseValidator implements Validator {
 	    ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 	    HttpSession session = attr.getRequest().getSession(false);
 	    return session;
-	}
-
-	/**
-	 * Checks if is date1 is equal to date2.
-	 *
-	 * @param date1 the date1
-	 * @param date2 the date2
-	 * @return true, if is date1 is equal to date2
-	 */
-	protected boolean isDateEqual(RatifiedDate date1, RatifiedDate date2) {
-		if(date1 == null || !date1.isRatified() || date2 == null || date2.isRatified()) {
-			return false;
-		}
-		setCalendars(date1, date2);
-		return (calendar1.compareTo(calendar2) == 0);
-	}
-
-	/**
-	 * Checks if is date1 is less than date2.
-	 *
-	 * @param date1 the date1
-	 * @param date2 the date2
-	 * @return true, if is date1 is less than date2
-	 */
-	protected boolean isDateLessThan(RatifiedDate date1, RatifiedDate date2) {
-		if(date1 == null || !date1.isRatified() || date2 == null || date2.isRatified()) {
-			return false;
-		}
-		setCalendars(date1, date2);
-		return (calendar1.compareTo(calendar2) < 0);
-	}
-
-	/**
-	 * Checks if is date1 is greater than date2.
-	 *
-	 * @param date1 the date1
-	 * @param date2 the date2
-	 * @return true, if is date1 is greater than date2
-	 */
-	protected boolean isDateGreaterThan(RatifiedDate date1, RatifiedDate date2) {
-		if(date1 == null || !date1.isRatified() || date2 == null || !date2.isRatified()) {
-			return false;
-		}
-		setCalendars(date1, date2);
-		return (calendar1.compareTo(calendar2) > 0);
 	}
 
 	/**

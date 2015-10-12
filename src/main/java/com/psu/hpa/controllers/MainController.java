@@ -54,8 +54,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.psu.hpa.ErrorMailSender;
-import com.psu.hpa.ImageProcessingException;
-import com.psu.hpa.UploadNotFoundException;
 import com.psu.hpa.application.FieldInfo;
 import com.psu.hpa.application.GUID;
 import com.psu.hpa.models.ErrorType;
@@ -137,13 +135,13 @@ public class MainController extends SessionUploadFormController {
 	@ModelAttribute(MODEL_UPLOAD)
 	public UploadModel populateCurrentUpload(
 			@ModelAttribute(FORM_NAME) Form form,
-			@PathVariable("id") GUID id) throws UploadNotFoundException {
+			@PathVariable("id") GUID id) throws Exception {
 		UploadModel result = null;
 		if(form.getUploads() != null) {
 			result = form.getUploads().get(id);
 		}
 		if(result == null) {
-			throw new UploadNotFoundException();
+			throw new Exception();
 		}
 		return result;
 	}

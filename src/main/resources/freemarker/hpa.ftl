@@ -5,10 +5,6 @@
 <html>
   <head>
     <title>${title}</title>
-    <#include "headers.ftl"/>
-    <#list scripts as script>
-      <script type="text/javascript" src="<@spring.url script/>"></script>
-    </#list> 
   </head>
   <body>
     <div data-role="page">
@@ -172,85 +168,3 @@
   <@spring.bind path/>
   <#return spring.status.expression?replace('[','')?replace(']','')/>
 </#function>
-
-<#--
- * formHorizontalRadio
- *
- * Render a horizontal radio button group.
- *
- * @param path the name of the field to bind to
- * @param options a map of options to display, values to titles
- * @param attribtues attributes to set for the radio buttons
--->
-<#macro formHorizontalRadio path options attributes='class="checkedRadio"'>
-  <#local attrs = attributes />
-  <fieldset data-role="controlgroup" data-type="horizontal">
-    <@spring.formRadioButtons path=path options=options separator="" attributes=attrs />
-  </fieldset>
-</#macro>
-
-<#--
- * formYesNo
- *
- * Render a yes/no radio button.
- *
- * @param path the name of the field to bind to
--->
-<#macro formYesNo path attr='class="checkedRadio"'>
-  <@formHorizontalRadio path=path options={"true": "Y", "false": "N"} attributes=attr />
-</#macro>
-
-<#--
- * formInputCurrency
- *
- * Render a form input that contains currency.  When the bound field is null, it will
- * contain only a '$'.
- *
- * @param path the name of the field to bind to
- * @param autocomplete enable or disable autocomplete for this field
- * @param attribtues attributes to set for the radio buttons
--->
-<#macro formInputCurrency path autocomplete=false attributes="">
-  <#local attr = '' />
-
-  <#local maxlength = fieldInfo.getMaxLength(springMacroRequestContext, path) />
-  <#if maxlength != -1>
-    <#local attr = 'maxlength="${maxlength}" ${attr}' />
-  </#if>
-
-  <@spring.bind path/>
-  <#if spring.status.value == "">
-    <#local value = "$"/>
-  <#else>
-    <#local value = spring.status.value/>
-  </#if>
-  
-  <#if !autocomplete>
-    <#local attr = 'autocomplete="off" ${attr}'/>
-  </#if>
-  
-  <#local hasError = (bindingResult?? && bindingResult.hasFieldErrors(spring.status.expression))/> 
-  
-  <input type="text" id="${fieldId(path)}" name="${spring.status.expression}" value="${value}" class="currency<#if hasError> error</#if>" ${attr} ${attributes} />
-</#macro>
-
-<#--
- * formSingleSelect
- *
- * Show a selectbox (dropdown) input element allowing a single value to be chosen
- * from a list of options.
- *
- * @param path the name of the field to bind to
- * @param options the name of the options to look up, e.g. "HPA_ProductName", or a hash of options
- * @param attributes any additional attributes for the element (such as class
- *    or CSS styles or size
--->
-<#macro formSingleSelect path options attributes='data-native-menu="false"'>
-  <#if options?is_hash>
-    <#local optionMap = options/>
-  <#else>
-    <#local optionMap = valueLookup.items(options)/>
-  </#if>
-  
-  <@spring.formSingleSelect path=path options=optionMap attributes=attributes />
-</#macro>
